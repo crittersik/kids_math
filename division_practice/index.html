@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Division Practice (up to 12x12)</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 20px;
+        }
+        table {
+            margin: 20px auto;
+            border-collapse: collapse;
+            width: 60%;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: center;
+        }
+        th {
+            background-color: #f4f4f4;
+        }
+        input {
+            width: 80%;
+            padding: 5px;
+            text-align: center;
+        }
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+        }
+        .correct {
+            background-color: #c8f7c5;
+        }
+        .incorrect {
+            background-color: #f7c5c5;
+        }
+    </style>
+    <script>
+        let problems = [];
+
+        function generateProblems() {
+            problems = [];
+            const maxNumber = 12;
+            const tableBody = document.getElementById('problems-body');
+            tableBody.innerHTML = '';
+
+            for (let i = 0; i < 5; i++) {
+                const divisor = Math.floor(Math.random() * maxNumber) + 1;
+                const quotient = Math.floor(Math.random() * maxNumber) + 1;
+                const total = divisor * quotient;
+                const missingField = Math.floor(Math.random() * 3);
+                
+                let row = '<tr>';
+                row += missingField === 0 ? `<td><input id="input-${i}-0" type="number"></td>` : `<td>${total}</td>`;
+                row += missingField === 1 ? `<td><input id="input-${i}-1" type="number"></td>` : `<td>${divisor}</td>`;
+                row += missingField === 2 ? `<td><input id="input-${i}-2" type="number"></td>` : `<td>${quotient}</td>`;
+                row += '</tr>';
+                
+                problems.push([total, divisor, quotient]);
+                tableBody.innerHTML += row;
+            }
+        }
+
+        function checkAnswers() {
+            for (let i = 0; i < problems.length; i++) {
+                for (let j = 0; j < 3; j++) {
+                    const userInput = document.getElementById(`input-${i}-${j}`);
+                    if (userInput) {
+                        if (parseFloat(userInput.value) === problems[i][j]) {
+                            userInput.classList.add('correct');
+                            userInput.classList.remove('incorrect');
+                        } else {
+                            userInput.classList.add('incorrect');
+                            userInput.classList.remove('correct');
+                        }
+                    }
+                }
+            }
+        }
+
+        window.onload = generateProblems;
+    </script>
+</head>
+<body>
+    <h1>Division Practice (up to 12x12)</h1>
+    <p>Fill in the missing values and click 'Check Answers' to see how you did!</p>
+    <table>
+        <thead>
+            <tr>
+                <th>Total</th>
+                <th>Number of Equal Groups</th>
+                <th>Amount in Each Group</th>
+            </tr>
+        </thead>
+        <tbody id="problems-body"></tbody>
+    </table>
+    <button onclick="checkAnswers()">Check Answers</button>
+    <button onclick="generateProblems()">New Problems</button>
+</body>
+</html>
