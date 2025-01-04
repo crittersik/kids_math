@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Famous Computer Scientists Quiz</title>
+    <title>History of Computer Science - Computer Scientists - Quiz</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -51,7 +51,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>Famous Computer Scientists Quiz</h1>
+        <h1>History of Computer Science - Computer Scientists - Quiz</h1>
         <div id="quiz"></div>
         <div id="score"></div>
     </div>
@@ -67,6 +67,11 @@
             return shuffled.slice(0, num);
         }
 
+        // Shuffle options for each question
+        function shuffleArray(array) {
+            return array.sort(() => 0.5 - Math.random());
+        }
+
         const selectedQuestions = getRandomQuestions(quizData, 3);
 
         selectedQuestions.forEach((q, index) => {
@@ -77,9 +82,13 @@
             const optionsDiv = document.createElement('div');
             optionsDiv.className = 'options';
 
-            q.options.forEach((option, i) => {
+            // Create a shuffled copy of options with correct answer tracking
+            const optionIndexes = q.options.map((_, i) => i);
+            const shuffledIndexes = shuffleArray(optionIndexes);
+
+            shuffledIndexes.forEach((i) => {
                 const button = document.createElement('button');
-                button.innerText = option;
+                button.innerText = q.options[i];
                 button.onclick = () => {
                     if (button.classList.contains('correct') || button.classList.contains('wrong')) return;
                     if (i === q.answer) {
@@ -87,7 +96,7 @@
                         score++;
                     } else {
                         button.classList.add('wrong');
-                        optionsDiv.children[q.answer].classList.add('correct');
+                        optionsDiv.children[shuffledIndexes.indexOf(q.answer)].classList.add('correct');
                     }
                     if (index === selectedQuestions.length - 1) {
                         scoreContainer.innerHTML = `You scored ${score} out of ${selectedQuestions.length}`;
