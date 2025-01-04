@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>History of Computer Science - Computer Scientists - Quiz</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+        }
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+        }
+        .question {
+            margin: 20px 0;
+        }
+        .options button {
+            display: block;
+            margin: 5px 0;
+            padding: 10px;
+            width: 100%;
+            text-align: left;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            cursor: pointer;
+            background: #f9f9f9;
+        }
+        .options button.correct {
+            background-color: #c8e6c9;
+        }
+        .options button.wrong {
+            background-color: #ffcdd2;
+        }
+        #score {
+            text-align: center;
+            font-size: 1.2em;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>History of Computer Science - Computer Scientists - Quiz</h1>
+        <div id="quiz"></div>
+        <div id="score"></div>
+    </div>
+    <script src="quizData.js"></script>
+    <script>
+        const quizContainer = document.getElementById('quiz');
+        const scoreContainer = document.getElementById('score');
+        let score = 0;
+
+        // Shuffle and select 3 random questions
+        function getRandomQuestions(data, num) {
+            const shuffled = data.sort(() => 0.5 - Math.random());
+            return shuffled.slice(0, num);
+        }
+
+        // Shuffle options for each question
+        function shuffleArray(array) {
+            return array.sort(() => 0.5 - Math.random());
+        }
+
+        const selectedQuestions = getRandomQuestions(quizData, 3);
+
+        selectedQuestions.forEach((q, index) => {
+            const questionDiv = document.createElement('div');
+            questionDiv.className = 'question';
+            questionDiv.innerHTML = `<strong>Q${index + 1}: ${q.question}</strong>`;
+
+            const optionsDiv = document.createElement('div');
+            optionsDiv.className = 'options';
+
+            // Create a shuffled copy of options with correct answer tracking
+            const optionIndexes = q.options.map((_, i) => i);
+            const shuffledIndexes = shuffleArray(optionIndexes);
+
+            shuffledIndexes.forEach((i) => {
+                const button = document.createElement('button');
+                button.innerText = q.options[i];
+                button.onclick = () => {
+                    if (button.classList.contains('correct') || button.classList.contains('wrong')) return;
+                    if (i === q.answer) {
+                        button.classList.add('correct');
+                        score++;
+                    } else {
+                        button.classList.add('wrong');
+                        optionsDiv.children[shuffledIndexes.indexOf(q.answer)].classList.add('correct');
+                    }
+                    if (index === selectedQuestions.length - 1) {
+                        scoreContainer.innerHTML = `You scored ${score} out of ${selectedQuestions.length}`;
+                    }
+                };
+                optionsDiv.appendChild(button);
+            });
+
+            questionDiv.appendChild(optionsDiv);
+            quizContainer.appendChild(questionDiv);
+        });
+    </script>
+</body>
+</html>
