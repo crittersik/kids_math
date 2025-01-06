@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Code Quest</title>
+  <style>
+    #game-board {
+      display: grid;
+      grid-template-columns: repeat(5, 60px);
+      grid-template-rows: repeat(5, 60px);
+      grid-gap: 2px;
+      margin: 20px;
+      border: 2px solid black;
+    }
+    .cell {
+      width: 60px;
+      height: 60px;
+      border: 1px solid gray;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .robot {
+      background-color: lightblue;
+      border: 2px solid blue;
+      width: 50px;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+    .robot::after {
+      content: '';
+      width: 0;
+      height: 0;
+      border-style: solid;
+      position: absolute;
+    }
+    .robot.up::after {
+      border-width: 0 10px 20px 10px;
+      border-color: transparent transparent darkblue transparent;
+      top: 5px;
+    }
+    .robot.down::after {
+      border-width: 20px 10px 0 10px;
+      border-color: darkblue transparent transparent transparent;
+      bottom: 5px;
+    }
+    .robot.left::after {
+      border-width: 10px 20px 10px 0;
+      border-color: transparent darkblue transparent transparent;
+      left: 5px;
+    }
+    .robot.right::after {
+      border-width: 10px 0 10px 20px;
+      border-color: transparent transparent transparent darkblue;
+      right: 5px;
+    }
+    .goal {
+      background-color: gold;
+      border: 2px solid orange;
+      width: 50px;
+      height: 50px;
+    }
+    .obstacle {
+      background-color: gray;
+      border: 2px solid black;
+      width: 50px;
+      height: 50px;
+    }
+    #instructions {
+      margin: 20px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      background-color: #f9f9f9;
+    }
+  </style>
+</head>
+<body>
+  <h1>Code Quest</h1>
+  <div id="instructions">
+    <p><strong>Instructions:</strong></p>
+    <p>Your goal is to navigate the robot to the gold square while avoiding obstacles.</p>
+    <p>Available commands:</p>
+    <ul>
+      <li><code>moveForward()</code>: Move the robot one step forward in its current direction.</li>
+      <li><code>turnLeft()</code>: Turn the robot left.</li>
+      <li><code>turnRight()</code>: Turn the robot right.</li>
+    </ul>
+    <p>Enter your commands in the text area below and click <strong>Run Code</strong> to execute them.</p>
+  </div>
+  <div id="game-board"></div>
+  <textarea id="code-input" rows="5" placeholder="Enter commands here..."></textarea><br>
+  <button onclick="runCode()">Run Code</button>
+  <script>
+    const board = document.getElementById('game-board');
+    let robot = { x: 0, y: 0, direction: 'right' };
+    let goal = { x: 4, y: 4 };
+    let obstacles = [];
+
+    function generateObstacles() {
+      obstacles = [];
+      while (obstacles.length < 5) {
+        let obstacle = { x: Math.floor(Math.random() * 5), y: Math.floor(Math.random() * 5) };
+        if ((obstacle.x !== robot.x || obstacle.y !== robot.y) && (obstacle.x !== goal.x || obstacle.y !== goal.y) && !obstacles.some(o => o.x === obstacle.x && o.y === obstacle.y)) {
+          obstacles.push(obstacle);
+        }
+      }
+    }
+
+    function render() {
+      board.innerHTML = '';
+      for (let y = 0; y < 5; y++) {
+        for (let x = 0; x < 5; x++) {
+          const cell = document.createElement('div');
+          cell.classList.add('cell');
+          if (x === robot.x && y === robot.y) {
+            const robotDiv = document.createElement('div');
+            robotDiv.classList.add('robot', robot.direction);
+            cell.appendChild(robotDiv);
+          }
+          if (x === goal.x && y === goal.y) {
+            const goalDiv = document.createElement('div');
+            goalDiv.classList.add('goal');
+            cell.appendChild(goalDiv);
+          }
+          if (obstacles.some(o => o.x === x && o.y === y)) {
+            const obstacleDiv = document.createElement('div');
+            obstacleDiv.classList.add('obstacle');
+            cell.appendChild(obstacleDiv);
+          }
+          board.appendChild(cell);
+        }
+      }
+    }
+
+    function moveForward() {
+      let nextX = robot.x;
+      let nextY = robot.y;
+      if (robot.direction === 'up') nextY--;
+      if (robot.direction === 'down') nextY++;
+      if (robot.direction === 'left') nextX--;
+      if (robot.direction === 'right') nextX++;
+      if (nextX >= 0 && nextX < 5 && nextY >= 0 && nextY < 5 && !obstacles.some(o => o.x === nextX && o.y === nextY)) {
+        robot.x = nextX;
+        robot.y = nextY;
+      }
+    }
+
+    function turnLeft() {
+      const directions = ['up', 'left', 'down', 'right'];
+      robot.direction = directions[(directions.indexOf(robot.direction) + 1) % 4];
+    }
+
+    function turnRight() {
+      const directions = ['up', 'right', 'down', 'left'];
+      robot.direction = directions[(directions.indexOf(robot.direction) + 1) % 4];
+    }
+
+    function runCode() {
+      const code = document.getElementById('code-input').value.split('\n');
+      code.forEach((line) => {
+        if (line.trim() === 'moveForward()') moveForward();
+        if (line.trim() === 'turnLeft()') turnLeft();
+        if (line.trim() === 'turnRight()') turnRight();
+      });
+      render();
+      checkWin();
+    }
+
+    function checkWin() {
+      if (robot.x === goal.x && robot.y === goal.y) {
+        alert('You Win! Great job!');
+      }
+    }
+
+    generateObstacles();
+    render();
+  </script>
+</body>
+</html>
